@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Profile</title>
+
+    <!-- SAME FONT & SCALE AS SIGNUP -->
+    <link rel="stylesheet" href="/Profile_create_style.css">
+</head>
+<body>
+
+<div class="onboarding-container">
+
+    <!-- Progress bar -->
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Card holder -->
+    <div class="card-stack">
+
+        <!-- STEP 1 -->
+        <div class="card active" data-step="1">
+            <h1>What should we call you?</h1>
+            <p>This will be visible on your profile</p>
+
+            <input type="text" id="name" placeholder="Your name" />
+
+            <button class="next-btn" onclick="nextStep()">Next →</button>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="card" data-step="2">
+            <h1>Your gender</h1>
+            <p>Used only to improve matches</p>
+
+            <div class="choice-group">
+                <button onclick="selectGender(this, 'Male')">Male</button>
+                <button onclick="selectGender(this, 'Female')">Female</button>
+                <button onclick="selectGender(this, 'Other')">Other</button>
+            </div>
+
+            <button class="next-btn" onclick="nextStep()">Next →</button>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="card" data-step="3">
+            <h1>Short bio</h1>
+            <p>Say something about yourself</p>
+
+            <textarea id="bio" placeholder="I love physics, startups and night walks…"></textarea>
+
+            <button class="next-btn" onclick="submitProfile()">Finish →</button>
+        </div>
+
+    </div>
+</div>
+
+<script src="/Profile_create_script.js"></script>
+</body>
+</html>
