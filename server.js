@@ -21,7 +21,11 @@ app.use(
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
-        cookie: { maxAge: 1000 * 60 * 60 * 24 }
+        cookie: {
+            httpOnly: true,
+            sameSite: "lax"
+            // maxAge intentionally omitted → session cookie
+        }
     })
 );
 
@@ -29,37 +33,27 @@ app.set("view engine", "ejs");
 
 /* ===================== AUTH GUARDS ===================== */
 
-// must be logged in
 const requireAuth = (req, res, next) => {
-    if (!req.session.userId) {
-        return res.redirect("/sign_in");
-    }
+    if (!req.session.userId) return res.redirect("/sign_in");
     next();
 };
 
-// must NOT be logged in
 const requireGuest = (req, res, next) => {
-    if (req.session.userId) {
-        return res.redirect("/dashboard");
-    }
+    if (req.session.userId) return res.redirect("/dashboard");
     next();
 };
 
-// must have profile completed
 const requireProfile = async (req, res, next) => {
     const user = await User.findById(req.session.userId);
-    if (!user.Profile_created_status) {
-        return res.redirect("/Profile_create");
-    }
+    if (!user) return res.redirect("/sign_in");
+    if (!user.Profile_created_status) return res.redirect("/Profile_create");
     next();
 };
 
-// must NOT have profile completed
 const requireNoProfile = async (req, res, next) => {
     const user = await User.findById(req.session.userId);
-    if (user.Profile_created_status) {
-        return res.redirect("/dashboard");
-    }
+    if (!user) return res.redirect("/sign_in");
+    if (user.Profile_created_status) return res.redirect("/dashboard");
     next();
 };
 
@@ -78,6 +72,9 @@ app.get("/", requireGuest, (req, res) => {
 
 app.post("/", requireGuest, async (req, res) => {
     const { name, email, dob, phone, pin } = req.body;
+
+    const exists = await User.findOne({ email });
+    if (exists) return res.redirect("/sign_in");
 
     await User.create({
         name,
@@ -101,17 +98,12 @@ app.post("/sign_in", requireGuest, async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user || String(user.pin) !== String(pin)) {
-        return res.render("sign_in", {
-            error: "Invalid email or PIN"
-        });
+        return res.render("sign_in", { error: "Invalid email or PIN" });
     }
 
     req.session.userId = user._id;
 
-    if (user.Profile_created_status) {
-        return res.redirect("/dashboard");
-    }
-
+    if (user.Profile_created_status) return res.redirect("/dashboard");
     res.redirect("/Profile_create");
 });
 
@@ -134,23 +126,20 @@ app.post(
         const { name, gender, bio } = req.body;
         const user = await User.findById(req.session.userId);
 
-        if (!user) return res.sendStatus(401);
+        if (!user) return res.redirect("/sign_in");
 
-        await Profile.create({
-            email: user.email,
-            name,
-            gender,
-            bio
-        });
+        await Profile.findOneAndUpdate(
+            { email: user.email },
+            { email: user.email, name, gender, bio },
+            { upsert: true }
+        );
 
         user.Profile_created_status = true;
         await user.save();
 
-        // ✅ SERVER controls next step
         res.redirect("/dashboard");
     }
 );
-
 
 /* ---------- DASHBOARD ---------- */
 app.get(
@@ -162,14 +151,14 @@ app.get(
         const profile = await Profile.findOne({ email: user.email }).lean();
 
         delete user.pin;
-
         res.render("dashboard", { user, profile });
     }
 );
 
-/* ---------- LOG OUT ---------- */
-app.get("/logout", (req, res) => {
+/* ---------- LOGOUT ---------- */
+app.post("/logout", requireAuth, (req, res) => {
     req.session.destroy(() => {
+        res.clearCookie("connect.sid");
         res.redirect("/sign_in");
     });
 });
