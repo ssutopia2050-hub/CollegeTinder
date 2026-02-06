@@ -22,9 +22,8 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            httpOnly: true,
-            sameSite: "lax"
-            // maxAge intentionally omitted → session cookie
+            httpOnly: true
+            // no maxAge → session cookie
         }
     })
 );
