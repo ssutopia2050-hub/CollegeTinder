@@ -141,21 +141,10 @@ app.post(
 );
 
 /* ---------- DASHBOARD ---------- */
-app.get(
-    "/dashboard",
-    requireAuth,
-    requireProfile,
-    async (req, res) => {
-        const user = await User.findById(req.session.userId).lean();
-        const profile = await Profile.findOne({ email: user.email }).lean();
 
-        delete user.pin;
-        res.render("dashboard", { user, profile });
-    }
-);
 
 /* ---------- LOGOUT ---------- */
-app.post("/logout", requireAuth, (req, res) => {
+app.get("/logout", requireAuth, (req, res) => {
     req.session.destroy(() => {
         res.clearCookie("connect.sid");
         res.redirect("/sign_in");
@@ -225,6 +214,29 @@ app.post("/recover-pin", requireGuest, async (req, res) => {
         });
     }
 });
+
+app.get(
+    "/dashboard",
+    requireAuth,
+    requireProfile,
+    async (req, res) => {
+        const user = await User.findById(req.session.userId).lean();
+        const profile = await Profile.findOne({ email: user.email }).lean();
+
+        if (!user) {
+            req.session.destroy();
+            return res.redirect("/sign_in");
+        }
+
+        delete user.pin;
+
+        res.render("dashboard", {
+            user,
+            profile: profile || null   // ✅ THIS LINE FIXES EVERYTHING
+        });
+    }
+);
+
 
 
 app.get("/terms_and_conditions", (req, res) => {

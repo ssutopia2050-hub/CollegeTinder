@@ -2,12 +2,184 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Recover PIN</title>
+    <title>Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", system-ui, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fd5068, #ff7854);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #222;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 900px;
+            padding: 24px;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 18px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .logout {
+            background: rgba(0,0,0,0.1);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .logout:hover {
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* Profile card */
+        .profile-card h2 {
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+
+        .profile-card p {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(0,0,0,0.1);
+        }
+
+        /* Actions */
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .action-card {
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+        }
+
+        .action-card h3 {
+            margin-bottom: 6px;
+            font-size: 16px;
+        }
+
+        .action-card p {
+            font-size: 13px;
+            color: #444;
+        }
+
+        /* Footer note */
+        .note {
+            font-size: 12px;
+            text-align: center;
+            color: #333;
+            opacity: 0.8;
+        }
+    </style>
 </head>
+
 <body>
-<h1>Welcome, <%= user.name %></h1>
-<p>Email: <%= user.email %></p>
-<p>Phone: <%= user.phone %></p>
-<p>DOB: <%= user.dob %></p>
+
+<div class="dashboard">
+
+    <!-- HEADER -->
+    <div class="glass header">
+        <h1>Welcome, <%= user.name %> 👋</h1>
+        <button class="logout" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- PROFILE SUMMARY -->
+    <div class="glass profile-card">
+        <h2>Your Profile</h2>
+
+        <p><strong>Email:</strong> <%= user.email %></p>
+
+        <% if (profile) { %>
+        <p><strong>Gender:</strong> <%= profile.gender %></p>
+        <p><strong>Bio:</strong> <%= profile.bio %></p>
+        <span class="badge">Profile Completed ✅</span>
+        <% } else { %>
+        <span class="badge">Profile Incomplete ⚠️</span>
+        <% } %>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+        <div class="glass action-card" onclick="goToDiscover()">
+            <h3>Discover</h3>
+            <p>Find people & explore</p>
+        </div>
+
+        <div class="glass action-card" onclick="editProfile()">
+            <h3>Edit Profile</h3>
+            <p>Change your details</p>
+        </div>
+
+        <div class="glass action-card" onclick="logout()">
+            <h3>Logout</h3>
+            <p>End this session</p>
+        </div>
+    </div>
+
+    <p class="note">More features coming soon 🚀</p>
+</div>
+
+<script>
+    function logout() {
+        window.location.href = "/logout";
+    }
+
+    function editProfile() {
+        alert("Profile editing coming soon 👀");
+    }
+
+    function goToDiscover() {
+        alert("Discover page coming next 😉");
+    }
+</script>
+
 </body>
 </html>
