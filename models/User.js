@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
     Profile_created_status: {
         type: Boolean,
         default: false
-    }
+    },
+    email_verified:Boolean
 });
 export default mongoose.model("User", userSchema);
 

@@ -34,7 +34,7 @@ app.use(
     session({
         secret: process.env.SESSION_SECRET,
         resave: false,
-        saveUninitialized: false,
+        saveUninitialized: true, // Changed to true to store temp signup data
         cookie: {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000 // 1 day
@@ -75,7 +75,10 @@ export const uploadGallery = multer({
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB
 });
 
-
+/* ===================== HELPER FUNCTIONS ===================== */
+function generateRandom4DigitNumber() {
+    return Math.floor(Math.random() * 9000) + 1000;
+}
 
 /* ===================== AUTH GUARDS ===================== */
 const requireAuth = (req, res, next) => {
@@ -116,21 +119,175 @@ app.get("/", requireGuest, (req, res) => {
 });
 
 app.post("/", requireGuest, async (req, res) => {
-    const { name, email, dob, phone, pin } = req.body;
+    try {
+        const { name, email, dob, phone, pin } = req.body;
 
-    const exists = await User.findOne({ email });
-    if (exists) return res.redirect("/sign_in");
+        // Check if user already exists
+        const exists = await User.findOne({ email });
+        if (exists) {
+            return res.render("index", {
+                error: "Email already registered. Please sign in."
+            });
+        }
 
-    await User.create({
-        name,
-        email,
-        dob,
-        phone,
-        pin,
-        Profile_created_status: false
+        // Generate OTP
+        const otp_generated = generateRandom4DigitNumber();
+
+        // Store signup data in session (NOT in database yet)
+        req.session.pendingSignup = {
+            name,
+            email,
+            dob,
+            phone,
+            pin,
+            otp: otp_generated,
+            otpExpiry: Date.now() + 10 * 60 * 1000 // 10 minutes
+        };
+
+        // Send OTP email
+        await emailjs.send(
+            process.env.EMAILJS_SERVICE_ID,
+            process.env.EMAILJS_VERIF_TEMPLATE_ID,
+            {
+                email: email, // Fixed: was using undefined 'user.email'
+                otp: otp_generated,
+                name: name
+            },
+            {
+                publicKey: process.env.EMAILJS_PUBLIC_KEY,
+                privateKey: process.env.EMAILJS_PRIVATE_KEY
+            }
+        );
+
+        console.log(`✅ OTP sent to ${email}: ${otp_generated}`); // For testing only - remove in production
+
+        res.redirect("/verify_email");
+    } catch (err) {
+        console.error("❌ Signup error:", err);
+        res.render("index", {
+            error: "Failed to send verification email. Please try again."
+        });
+    }
+});
+
+/* ---------- Email Verify ---------- */
+app.get("/verify_email", (req, res) => {
+    // Check if there's pending signup data
+    if (!req.session.pendingSignup) {
+        return res.redirect("/");
+    }
+
+    res.render("email_verify_page", {
+        error: null,
+        email: req.session.pendingSignup.email
     });
+});
 
-    res.redirect("/sign_in");
+app.post("/verify_email", async (req, res) => {
+    try {
+        const { otp } = req.body;
+
+        // Check if there's pending signup
+        if (!req.session.pendingSignup) {
+            return res.render("email_verify_page", {
+                error: "Session expired. Please sign up again.",
+                email: null
+            });
+        }
+
+        const { otp: storedOtp, otpExpiry, name, email, dob, phone, pin } = req.session.pendingSignup;
+
+        // Check if OTP expired
+        if (Date.now() > otpExpiry) {
+            delete req.session.pendingSignup;
+            return res.render("email_verify_page", {
+                error: "OTP expired. Please sign up again.",
+                email: email
+            });
+        }
+
+        // Verify OTP (convert both to strings for comparison)
+        if (String(otp) !== String(storedOtp)) {
+            return res.render("email_verify_page", {
+                error: "Invalid OTP. Please try again.",
+                email: email
+            });
+        }
+
+        // OTP is correct - Create the user account
+        await User.create({
+            name,
+            email,
+            dob,
+            phone,
+            pin,
+            Profile_created_status: false,
+            email_verified: true // Mark as verified
+        });
+
+        // Clear pending signup data
+        delete req.session.pendingSignup;
+
+        console.log(`✅ User verified and created: ${email}`);
+
+        res.redirect("/sign_in");
+    } catch (err) {
+        console.error("❌ Verification error:", err);
+        res.render("email_verify_page", {
+            error: "Verification failed. Please try again.",
+            email: req.session.pendingSignup?.email || null
+        });
+    }
+});
+
+/* ---------- RESEND OTP ---------- */
+app.post("/resend-otp", async (req, res) => {
+    try {
+        // Check if there's pending signup
+        if (!req.session.pendingSignup) {
+            return res.status(400).json({
+                success: false,
+                message: "No pending verification found"
+            });
+        }
+
+        const { email, name } = req.session.pendingSignup;
+
+        // Generate new OTP
+        const newOtp = generateRandom4DigitNumber();
+
+        // Update session with new OTP and expiry
+        req.session.pendingSignup.otp = newOtp;
+        req.session.pendingSignup.otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+        // Send new OTP email
+        await emailjs.send(
+            process.env.EMAILJS_SERVICE_ID,
+            process.env.EMAILJS_VERIF_TEMPLATE_ID,
+            {
+                email: email,
+                otp: newOtp,
+                name: name
+            },
+            {
+                publicKey: process.env.EMAILJS_PUBLIC_KEY,
+                privateKey: process.env.EMAILJS_PRIVATE_KEY
+            }
+        );
+
+        console.log(`✅ New OTP sent to ${email}: ${newOtp}`);
+
+        res.json({
+            success: true,
+            message: "New OTP sent successfully"
+        });
+    } catch (err) {
+        console.error("❌ Resend OTP error:", err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to resend OTP"
+        });
+    }
 });
 
 /* ---------- SIGN IN ---------- */
@@ -144,6 +301,13 @@ app.post("/sign_in", requireGuest, async (req, res) => {
 
     if (!user || String(user.pin) !== String(pin)) {
         return res.render("sign_in", { error: "Invalid email or PIN" });
+    }
+
+    // Check if email is verified
+    if (!user.email_verified) {
+        return res.render("sign_in", {
+            error: "Email not verified. Please complete verification first."
+        });
     }
 
     req.session.userId = user._id;
@@ -162,6 +326,7 @@ app.get(
         res.render("Profile_create", { user });
     }
 );
+
 app.post(
     "/create-profile",
     requireAuth,
@@ -173,11 +338,11 @@ app.post(
         if (!user) return res.redirect("/sign_in");
 
         await Profile.create({
-            user: user._id,              // 🔧 FIX
+            user: user._id,
             name,
             gender,
             bio,
-            uploads: [],                 // correct type
+            uploads: [],
             pfp: null
         });
 
@@ -188,7 +353,6 @@ app.post(
     }
 );
 
-
 /* ---------- DASHBOARD ---------- */
 app.get(
     "/dashboard",
@@ -196,7 +360,7 @@ app.get(
     requireProfile,
     async (req, res) => {
         const user = await User.findById(req.session.userId).lean();
-        const profile = await Profile.findOne({ user: user._id }).lean(); // 🔧 FIX
+        const profile = await Profile.findOne({ user: user._id }).lean();
 
         if (!user || !profile) {
             req.session.destroy();
@@ -208,11 +372,10 @@ app.get(
         res.render("dashboard", {
             user,
             profile,
-            images: profile.uploads // 🔧 FIX (no normalization hacks)
+            images: profile.uploads
         });
     }
 );
-
 
 /* ---------- LOGOUT ---------- */
 app.get("/logout", requireAuth, (req, res) => {
@@ -280,7 +443,7 @@ app.post(
     async (req, res) => {
         try {
             const user = await User.findById(req.session.userId);
-            const profile = await Profile.findOne({ user: req.session.userId });// 🔧 FIX
+            const profile = await Profile.findOne({ user: req.session.userId });
 
             if (!req.file) return res.status(400).json({ success: false });
 
@@ -303,7 +466,6 @@ app.post(
     }
 );
 
-/* ---------- GALLERY IMAGE UPLOAD ---------- */
 /* ---------- GALLERY IMAGE UPLOAD ---------- */
 app.post(
     "/upload/gallery",
@@ -343,7 +505,6 @@ app.post(
     }
 );
 
-
 /* ---------- LIKE IMAGE ---------- */
 app.post(
     "/like-image/:imageId",
@@ -352,7 +513,7 @@ app.post(
     async (req, res) => {
         try {
             const user = await User.findById(req.session.userId);
-            const profile = await Profile.findOne({ email: user.email });
+            const profile = await Profile.findOne({ user: user._id }); // Fixed: was using email
 
             const image = profile.uploads.id(req.params.imageId);
             if (!image) return res.status(404).json({ error: "Image not found" });
@@ -390,7 +551,7 @@ app.delete(
     async (req, res) => {
         try {
             const user = await User.findById(req.session.userId);
-            const profile = await Profile.findOne({ email: user.email });
+            const profile = await Profile.findOne({ user: user._id }); // Fixed: was using email
 
             const image = profile.uploads.id(req.params.imageId);
             if (!image) return res.sendStatus(404);
