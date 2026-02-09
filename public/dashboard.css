@@ -1,0 +1,836 @@
+/* ================= RESET ================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ================= BASE ================= */
+
+body {
+    font-family: "Oswald", sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fd5068, #ff7854);
+    color: #222;
+}
+
+/* ================= HEADER ================= */
+
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.19);
+}
+
+.header a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.header a i {
+    font-size: 16px;
+}
+
+.header a:hover {
+    color: #fff;
+}
+
+.header a::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #ffdfa6;
+    transition: width 0.2s ease;
+}
+
+.header a:hover::after,
+.header a.active::after {
+    width: 100%;
+}
+
+.header a.active {
+    color: #ffdfa6;
+}
+
+.header a.discover {
+    font-size: 28px;
+    color: #fff;
+}
+
+/* ================= CONTENT ================= */
+
+.content {
+    display: flex;
+    width: 100%;
+}
+
+/* ================= WRAPPER (FIXED) ================= */
+
+.wrapper {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 120px);
+    flex-wrap: wrap;
+
+    padding-top: 80px;
+    padding-left: 150px;
+    padding-right: 150px;
+    padding-bottom: 50px;
+
+    column-gap: 40px;
+    row-gap: 40px;
+
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+
+/* ================= PROFILE CARD ================= */
+
+.profile-picture-container {
+    width: 300px;
+    height: 300px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: rgba(255, 255, 255, 0.09);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+
+    border-radius: 20px;
+    padding: 20px;
+
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.profile-picture-container img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+/* ================= STATS ================= */
+
+.stats-container {
+    flex: 1;
+    min-width: 600px;
+    max-width: calc(100% - 300px);
+    height: 300px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: rgba(255, 255, 255, 0.09);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+
+    border-radius: 20px;
+    padding: 20px;
+}
+
+/* ===== STAT CARDS ===== */
+
+.likes-display-card,
+.followers-display-card,
+.profile-view-time-display-card {
+    width: 30%;
+    height: 100%;
+
+    /*background-color: rgba(255, 255, 255, 0.28);*/
+    background-color: rgba(255, 255, 255, 0.38);
+    border-radius: 12px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+
+    color: white;
+}
+
+.likes-display-card i {
+    font-size: 100px;
+}
+
+.followers-display-card i {
+    margin-left:15%;
+    font-size: 90px;
+}
+
+.profile-view-time-display-card i {
+    font-size: 80px;
+}
+
+/* ================= BIO ================= */
+
+.personal-bio-container {
+    width: 30%;
+    min-height: 120px;
+
+    background-color: rgba(255, 255, 255, 0.09);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+
+    border-radius: 20px;
+    padding: 20px;
+
+    color: #ffffff;
+    font-size: 19px;
+    line-height: 1.5;
+    font-weight: bold;
+
+}
+
+/* ================= DETAILS ================= */
+
+.personal-details-container {
+    width: calc(70% - 40px);
+    min-height: 120px;
+
+    background-color: rgba(255, 255, 255, 0.09);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+
+    border-radius: 20px;
+    padding: 10px;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-evenly;
+    align-content: center;
+    /*color: black;*/
+}
+.small-card{
+    width:16%;
+    height:90%;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.63);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #000000;
+}
+.astrology-sign-display-card img{
+    height:100%;
+    width:100%;
+    border-radius: 10px;
+}
+/* ================= UPLOADS ================= */
+
+.uploads-display-container {
+    width: 100%;
+    min-height: 500px;
+    overflow-y: scroll;
+    background-color: rgba(255, 255, 255, 0.09);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+
+    border-radius: 20px;
+    padding: 50px;
+
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    /*gap: 20px;*/
+    justify-content: flex-start;
+    align-content: center;
+    /*justify-content: center;*/
+    gap: 20px;
+    color: white;
+}
+.uploaded-image-container{
+    background-color: rgba(255, 255, 255, 0.09);
+    height:400px;
+    width:320px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.uploaded-image-container:not(.upload-trigger):hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.uploaded-image-container img {
+    width:100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+/* ================= FOOTER ================= */
+
+.footer {
+    background: linear-gradient(135deg, #0f0f14, #1a1a25);
+    padding: 60px 80px;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 50px;
+
+    color: #ddd;
+}
+
+.footer-box h3 {
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: #ffdfa6;
+    margin-bottom: 20px;
+}
+
+.footer-box p {
+    opacity: 0.7;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.footer-box p:hover {
+    opacity: 1;
+}
+
+/* ================= SOCIALS ================= */
+
+.socials {
+    display: flex;
+    gap: 18px;
+}
+
+.social {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+    color: #fff;
+    text-decoration: none;
+
+    transition: all 0.35s ease;
+}
+
+.social.instagram:hover {
+    background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af);
+    transform: translateY(-6px);
+}
+
+.social.x:hover {
+    background: #000;
+    transform: translateY(-6px);
+}
+
+.social.youtube:hover {
+    background: #ff0000;
+    transform: translateY(-6px);
+}
+
+/* ================= OVERLAY (IMPROVED) ================= */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ================= MODAL (IMPROVED) ================= */
+
+.upload-modal {
+    width: 500px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+    backdrop-filter: blur(30px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 45px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.upload-modal h2 {
+    margin-bottom: 30px;
+    font-weight: 500;
+    font-size: 26px;
+    color: #ffdfa6;
+    text-shadow: 0 2px 10px rgba(255, 193, 64, 0.3);
+}
+
+/* ================= DROP ZONE (IMPROVED) ================= */
+
+.drop-zone {
+    border: 3px dashed rgba(255, 193, 64, 0.5);
+    border-radius: 20px;
+    padding: 60px 30px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    background: rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.drop-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 193, 64, 0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.drop-zone:hover::before {
+    opacity: 1;
+}
+
+.drop-zone i {
+    font-size: 64px;
+    margin-bottom: 18px;
+    color: #ffc140;
+    transition: all 0.4s ease;
+    filter: drop-shadow(0 4px 15px rgba(255, 193, 64, 0.4));
+}
+
+.drop-zone:hover i {
+    transform: scale(1.15);
+    color: #ffdfa6;
+}
+
+.drop-zone p {
+    font-size: 18px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.drop-zone span {
+    font-size: 14px;
+    opacity: 0.6;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.drop-zone.drag-over {
+    border-color: #ffc140;
+    background: rgba(255, 193, 64, 0.2);
+    transform: scale(1.02);
+    box-shadow: 0 10px 40px rgba(255, 193, 64, 0.3);
+}
+
+.drop-zone.file-selected {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.15);
+}
+
+.drop-zone.file-selected i {
+    color: #4ade80;
+}
+
+.drop-zone.uploading {
+    border-color: #60a5fa;
+    background: rgba(96, 165, 250, 0.15);
+    pointer-events: none;
+}
+
+.drop-zone.uploading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Circle style for PFP (IMPROVED) */
+.drop-zone.circle {
+    border-radius: 50%;
+    width: 260px;
+    height: 260px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
+}
+
+.drop-zone.circle i {
+    font-size: 72px;
+}
+
+/* ================= UPLOAD STATUS ================= */
+
+.upload-status {
+    margin-top: 20px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    min-height: 20px;
+}
+
+.upload-status.success {
+    color: #4ade80;
+}
+
+.upload-status.error {
+    color: #f87171;
+}
+
+/* ================= CLOSE BUTTON ================= */
+
+.close-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-overlay:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+/* ================= IMAGE VIEW OVERLAY ================= */
+
+.image-view-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(20px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.image-view-container {
+    display: flex;
+    gap: 40px;
+    max-width: 1200px;
+    width: 90%;
+    height: 80vh;
+    animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ================= IMAGE DISPLAY ================= */
+
+.image-display {
+    flex: 1;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(30px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+.image-display img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* ================= ACTION PANEL ================= */
+
+.action-panel {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ================= ACTION BUTTONS ================= */
+
+.action-btn {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.action-btn:hover::before {
+    opacity: 1;
+}
+
+.action-btn:hover {
+    transform: translateY(-5px) scale(1.02);
+}
+
+.action-btn:active {
+    transform: translateY(-2px) scale(0.98);
+}
+
+/* ================= LIKE BUTTON ================= */
+
+.like-btn {
+    flex: 1;
+}
+
+.like-btn:hover {
+    border-color: rgba(255, 107, 129, 0.6);
+    box-shadow: 0 15px 40px rgba(255, 107, 129, 0.3);
+}
+
+.like-btn i {
+    font-size: 56px;
+    color: #ff6b81;
+    transition: all 0.4s ease;
+    filter: drop-shadow(0 4px 15px rgba(255, 107, 129, 0.5));
+}
+
+.like-btn:hover i {
+    transform: scale(1.2);
+    color: #ff4757;
+}
+
+.like-btn.liked i {
+    font-weight: 900;
+    animation: heartBeat 0.6s ease;
+}
+
+@keyframes heartBeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.3);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    75% {
+        transform: scale(1.25);
+    }
+}
+
+.like-btn span {
+    font-size: 18px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ================= DELETE BUTTON ================= */
+
+.delete-btn {
+    flex: 1;
+}
+
+.delete-btn:hover {
+    border-color: rgba(239, 68, 68, 0.6);
+    box-shadow: 0 15px 40px rgba(239, 68, 68, 0.3);
+}
+
+.delete-btn i {
+    font-size: 52px;
+    color: #ef4444;
+    transition: all 0.4s ease;
+    filter: drop-shadow(0 4px 15px rgba(239, 68, 68, 0.5));
+}
+
+.delete-btn:hover i {
+    transform: scale(1.15) rotate(10deg);
+    color: #dc2626;
+}
+
+.delete-btn span {
+    font-size: 18px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ================= IMAGE INFO ================= */
+
+.image-info {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 25px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    line-height: 1.8;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.image-info p {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.image-info strong {
+    color: #ffdfa6;
+    font-weight: 500;
+}
+
+/* ================= CLOSE BUTTON FOR IMAGE VIEW ================= */
+
+.image-view-overlay .close-overlay {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.image-view-overlay .close-overlay:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 968px) {
+    .image-view-container {
+        flex-direction: column;
+        height: auto;
+        padding: 20px;
+    }
+
+    .image-display {
+        height: 50vh;
+    }
+
+    .action-panel {
+        width: 100%;
+        flex-direction: row;
+    }
+
+    .action-btn {
+        flex: 1;
+    }
+}
+.image-actions {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.like-btn,
+.delete-btn {
+    background: rgba(0,0,0,0.6);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.like-btn:hover {
+    background: rgba(255, 0, 0, 0.7);
+}
+
+.delete-btn:hover {
+    background: rgba(255, 80, 80, 0.8);
+}
