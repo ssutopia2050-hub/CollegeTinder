@@ -267,7 +267,7 @@
 </div>
 
 <script>
-    // Auto-focus the input
+    // Get DOM elements
     const otpInput = document.getElementById('otpInput');
     const verifyBtn = document.getElementById('verifyBtn');
     const resendBtn = document.getElementById('resendBtn');
@@ -275,129 +275,108 @@
     const resendTimerEl = document.getElementById('resendTimer');
     const timerEl = document.getElementById('timer');
 
+    // Auto-focus input
     otpInput.focus();
 
-    // Main countdown timer (10 minutes)
-    let timeLeft = 10 * 60; // 10 minutes in seconds
+    // -------- MAIN COUNTDOWN TIMER (10 min) --------
+    let timeLeft = 10 * 60; // seconds
     const mainTimer = setInterval(() => {
         timeLeft--;
-        
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
         countdownEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-        if (timeLeft <= 60) {
-            timerEl.classList.add('expired');
-        }
+        if (timeLeft <= 60) timerEl.classList.add('expired');
 
         if (timeLeft <= 0) {
             clearInterval(mainTimer);
             countdownEl.textContent = 'EXPIRED';
             otpInput.disabled = true;
             verifyBtn.disabled = true;
-            
+
             // Show expiry message
             const expiredAlert = document.createElement('div');
             expiredAlert.className = 'alert alert-error';
-            expiredAlert.innerHTML = '⏰ OTP has expired. Please sign up again.';
+            expiredAlert.textContent = '⏰ OTP has expired. Please sign up again.';
             otpInput.parentElement.parentElement.insertBefore(expiredAlert, otpInput.parentElement);
         }
     }, 1000);
 
-    // Resend countdown timer (60 seconds)
+    // -------- RESEND TIMER (60 sec) --------
     let resendTimeLeft = 60;
-    const resendTimer = setInterval(() => {
+    const resendCountdown = () => {
         resendTimeLeft--;
         resendTimerEl.textContent = resendTimeLeft;
-
         if (resendTimeLeft <= 0) {
-            clearInterval(resendTimer);
+            clearInterval(resendInterval);
             resendBtn.classList.remove('disabled');
-            resendBtn.innerHTML = '🔄 Resend Code';
-            resendBtn.style.cursor = 'pointer';
+            resendBtn.textContent = '🔄 Resend Code';
         }
-    }, 1000);
+    };
+    let resendInterval = setInterval(resendCountdown, 1000);
 
-    // Resend functionality
+    // -------- RESEND BUTTON CLICK --------
     resendBtn.addEventListener('click', async function() {
-        if (!this.classList.contains('disabled')) {
-            try {
-                // Disable button and show loading
-                this.classList.add('disabled');
-                this.innerHTML = '⏳ Sending...';
-                
-                const response = await fetch('/resend-otp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+        if (this.classList.contains('disabled')) return;
 
-                const data = await response.json();
+        try {
+            this.classList.add('disabled');
+            this.textContent = '⏳ Sending...';
 
-                if (data.success) {
-                    // Show success message
-                    const successAlert = document.createElement('div');
-                    successAlert.className = 'alert alert-success';
-                    successAlert.innerHTML = '✅ New code sent! Check your email.';
-                    otpInput.parentElement.parentElement.insertBefore(successAlert, otpInput.parentElement);
-                    
-                    // Remove success message after 5 seconds
-                    setTimeout(() => successAlert.remove(), 5000);
-                    
-                    // Reset the resend timer
-                    resendTimeLeft = 60;
-                    this.innerHTML = 'Resend code in <span id="resendTimer">60</span>s';
-                    
-                    const newResendTimer = setInterval(() => {
-                        resendTimeLeft--;
-                        const timerSpan = document.getElementById('resendTimer');
-                        if (timerSpan) timerSpan.textContent = resendTimeLeft;
+            const response = await fetch('/resend-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
 
-                        if (resendTimeLeft <= 0) {
-                            clearInterval(newResendTimer);
-                            resendBtn.classList.remove('disabled');
-                            resendBtn.innerHTML = '🔄 Resend Code';
-                        }
-                    }, 1000);
-                    
-                    // Reset main timer to 10 minutes
-                    timeLeft = 10 * 60;
-                    timerEl.classList.remove('expired');
-                    otpInput.disabled = false;
-                    verifyBtn.disabled = false;
-                    
-                } else {
-                    // Show error
-                    const errorAlert = document.createElement('div');
-                    errorAlert.className = 'alert alert-error';
-                    errorAlert.innerHTML = '❌ ' + data.message;
-                    otpInput.parentElement.parentElement.insertBefore(errorAlert, otpInput.parentElement);
-                    
-                    setTimeout(() => errorAlert.remove(), 5000);
-                    this.classList.remove('disabled');
-                    this.innerHTML = '🔄 Resend Code';
-                }
-            } catch (error) {
-                console.error('Resend error:', error);
+            const data = await response.json();
+
+            if (data.success) {
+                // Show success alert
+                const successAlert = document.createElement('div');
+                successAlert.className = 'alert alert-success';
+                successAlert.textContent = '✅ New code sent! Check your email.';
+                otpInput.parentElement.parentElement.insertBefore(successAlert, otpInput.parentElement);
+                setTimeout(() => successAlert.remove(), 5000);
+
+                // Reset resend timer
+                resendTimeLeft = 60;
+                resendTimerEl.textContent = resendTimeLeft;
+                resendBtn.textContent = 'Resend code in ';
+                resendBtn.appendChild(resendTimerEl);
+
+                // Start resend interval again
+                resendInterval = setInterval(resendCountdown, 1000);
+
+                // Reset main timer
+                timeLeft = 10 * 60;
+                timerEl.classList.remove('expired');
+                otpInput.disabled = false;
+                verifyBtn.disabled = false;
+            } else {
+                const errorAlert = document.createElement('div');
+                errorAlert.className = 'alert alert-error';
+                errorAlert.textContent = '❌ ' + data.message;
+                otpInput.parentElement.parentElement.insertBefore(errorAlert, otpInput.parentElement);
+                setTimeout(() => errorAlert.remove(), 5000);
+
                 this.classList.remove('disabled');
-                this.innerHTML = '🔄 Resend Code';
+                resendBtn.textContent = '🔄 Resend Code';
             }
+        } catch (err) {
+            console.error('Resend error:', err);
+            this.classList.remove('disabled');
+            resendBtn.textContent = '🔄 Resend Code';
         }
     });
 
-    // Only allow numbers in OTP input
-    otpInput.addEventListener('input', function(e) {
+    // -------- OTP INPUT VALIDATION --------
+    otpInput.addEventListener('input', function() {
         this.value = this.value.replace(/[^0-9]/g, '');
-        
-        // Remove error class when user starts typing
         this.classList.remove('error');
     });
 
-    // Form validation
     document.getElementById('otpForm').addEventListener('submit', function(e) {
         const otp = otpInput.value;
-        
         if (otp.length !== 4) {
             e.preventDefault();
             otpInput.classList.add('error');
@@ -405,14 +384,13 @@
         }
     });
 
-    // Add error class if there was an error on page load
-
-    // Clear timers when page unloads
+    // -------- CLEANUP ON PAGE UNLOAD --------
     window.addEventListener('beforeunload', () => {
         clearInterval(mainTimer);
-        clearInterval(resendTimer);
+        clearInterval(resendInterval);
     });
 </script>
+
 
 </body>
 </html>
